@@ -10,11 +10,10 @@ import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
 import type { StringValue } from 'ms';
 import { AuthModule } from './common/auth/auth.module';
 import { GlobalExceptionFilter } from './common/exceptions/global-exception.filter';
-import { StartupModule } from './common/startup/startup.module';
-import { SeederService } from './common/startup/seeder.service';
 import { DomainsModule } from './modules/domains.module';
 import { AppValidationPipe } from './common/pipes/validation.pipe';
 import { SuccessResponseInterceptor } from './common/helper/success-response.interceptor';
+import { StartupModule } from './common/startup/startup.module';
 
 @Module({
   imports: [
@@ -43,6 +42,10 @@ import { SuccessResponseInterceptor } from './common/helper/success-response.int
         },
       }),
     }),
+    DatabaseModule,
+    StartupModule,
+    AuthModule,
+    DomainsModule
   ],
   providers: [
     {
@@ -60,8 +63,7 @@ import { SuccessResponseInterceptor } from './common/helper/success-response.int
     {
       provide: APP_INTERCEPTOR,
       useClass: SuccessResponseInterceptor,
-    },
-    SeederService,
+    }
   ]
 })
 
