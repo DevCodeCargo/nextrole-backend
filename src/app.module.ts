@@ -14,6 +14,7 @@ import { DomainsModule } from './modules/domains.module';
 import { AppValidationPipe } from './common/pipes/validation.pipe';
 import { SuccessResponseInterceptor } from './common/helper/success-response.interceptor';
 import { StartupModule } from './common/startup/startup.module';
+import { EmailModule } from './common/email/email.module';
 
 @Module({
   imports: [
@@ -45,7 +46,8 @@ import { StartupModule } from './common/startup/startup.module';
     DatabaseModule,
     StartupModule,
     AuthModule,
-    DomainsModule
+    DomainsModule,
+    EmailModule
   ],
   providers: [
     {
