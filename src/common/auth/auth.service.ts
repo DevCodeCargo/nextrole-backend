@@ -6,6 +6,11 @@ import { LoginDto } from './login.dto';
 import knex, { Knex } from 'knex';
 import { PasswordService } from '../security/password.service';
 
+interface UserAuthRecord {
+  user_id: string;
+  password: string;
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -16,14 +21,13 @@ export class AuthService {
 
   async login(dto: LoginDto) {
 
-    const result: LoginDto = await this.platformDb.db<LoginDto>('user_accounts')
-      .join('user_auth', 'user_auth.user_id', '=', 'user_accounts.user_id')
+    const result = await this.platformDb.db('users')
       .select(
-        this.platformDb.db.ref('user_id').withSchema('user_accounts').as('user_id'),
-        this.platformDb.db.ref('password_hash').withSchema('user_auth').as('password'),
+        this.platformDb.db.ref('id').withSchema('users').as('user_id'),
+        this.platformDb.db.ref('password_hash').withSchema('users').as('password')
       )
-      .whereRaw('user_accounts.user_name = ?', dto.username)
-      .first();
+      .whereRaw('users.email = ?', dto.username)
+      .first() as UserAuthRecord | undefined;
 
     if (result == undefined) {
       throw new AppException(
