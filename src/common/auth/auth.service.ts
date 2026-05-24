@@ -2,7 +2,7 @@ import { Injectable, HttpStatus } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service';
 import { JwtService } from '@nestjs/jwt';
 import { AppException } from '../../common/exceptions/app.exception';
-import { LoginDto, RegisterDto } from './login.dto';
+import { EmailCheckDto, LoginDto, RegisterDto } from './login.dto';
 import knex, { Knex } from 'knex';
 import { PasswordService } from '../security/password.service';
 
@@ -22,12 +22,7 @@ export class AuthService {
 
   async register(dto: RegisterDto) {
 
-    const result = await this.platformDb.db('users')
-      .select(
-        this.platformDb.db.ref('id').withSchema('users').as('user_id')
-      )
-      .whereRaw('users.email = ?', dto.email)
-      .first() as UserAuthRecord | undefined;
+    const result = await this.checkEmailFromDB(dto.email);
 
     if (result !== undefined) {
       throw new AppException(
@@ -53,13 +48,7 @@ export class AuthService {
 
   async login(dto: LoginDto) {
 
-    const result = await this.platformDb.db('users')
-      .select(
-        this.platformDb.db.ref('id').withSchema('users').as('user_id'),
-        this.platformDb.db.ref('password_hash').withSchema('users').as('password')
-      )
-      .whereRaw('users.email = ?', dto.username)
-      .first() as UserAuthRecord | undefined;
+    const result = await this.checkEmailFromDB(dto.username);
 
     if (result == undefined) {
       throw new AppException(
@@ -92,5 +81,25 @@ export class AuthService {
     return {
       accessToken: token,
     };
+  }
+
+  async checkEmail(dto: EmailCheckDto): Promise<boolean> {
+
+    const result = await this.checkEmailFromDB(dto.email);
+
+    return result ? true : false;
+
+  }
+
+  private async checkEmailFromDB(emailId: string): Promise<UserAuthRecord | undefined> {
+    const result = await this.platformDb.db('users')
+      .select(
+        this.platformDb.db.ref('id').withSchema('users').as('user_id'),
+        this.platformDb.db.ref('password_hash').withSchema('users').as('password')
+      )
+      .whereRaw('users.email = ?', emailId)
+      .first() as UserAuthRecord | undefined;
+
+    return result;
   }
 }

@@ -1,6 +1,6 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto } from './login.dto';
+import { EmailCheckDto, LoginDto, RegisterDto } from './login.dto';
 import { Public } from '../decorators/public.decorator';
 
 @Controller('auth')
@@ -12,6 +12,15 @@ export class AuthController {
   async login(@Body() dto: LoginDto) {
     const result = await this.authService.login(dto);
     return result;
+  }
+
+  @Public()
+  @Post('checkEmail')
+  async checkEmail(@Body() dto: EmailCheckDto) {
+    const result = await this.authService.checkEmail(dto);
+    return {
+      exists: result
+    };
   }
 
   @Public()
