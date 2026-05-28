@@ -28,7 +28,7 @@ export class AuthService {
       throw new AppException(
         'User Already Exist',
         'USER_ALREADY_EXIST',
-        HttpStatus.NOT_ACCEPTABLE
+        HttpStatus.CONFLICT
       );
     }
 
